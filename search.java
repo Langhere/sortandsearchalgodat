@@ -12,56 +12,76 @@ public class search {
         return null; // Mengembalikan null jika targetStok tidak ditemukan
     }
 
-    //search key
+    //search key, ini fungsi untuk mencari key kunci
     public Node searchByKey(Node head, String key) {
         Node current = head;
         while (current != null) {
+            //mengubah nama senjata ke lowercase agar mudah dibandingkan
             if (current.namaSenjata.toLowerCase().contains(key.toLowerCase())) {
-                // Node contains the key, print or handle as needed
+                // print semua data node yang mengandung key
                 System.out.println("Senjata dengan nama '" + key + "' ditemukan:");
                 System.out.println("Nama: " + current.namaSenjata);
                 System.out.println("Stok: " + current.stok);
-                System.out.println("ID: " + current.id);
+                System.out.println("id: " + current.id);
                 System.out.println("Harga: " + current.harga);
             }
             current = current.next;
         }
-        return null; // You may choose to return the found node if needed
+        return null; 
+        //retunr null jika tidak ada
     }
-        // Binary Search berdasarkan harga (Ascending)
+    //ini fungsi untuk binary search dengan paramater head dan target harga(harga)
+    private Node binarySearchDescending(Node head, int targetHarga) {
+        Node current = head;
 
-        public void searchByHarga(Node head, int targetHarga) {
-            sort sorter = new sort(); // Buat objek sorter
-            int position = sorter.binarySearch(head, targetHarga); // Gunakan objek sorter
-        
-            if (position != -1) {
-                Node foundNode = sorter.getNodeAtPosition(head, position); // Gunakan objek sorter
-                Node nextNode = (foundNode.next != null) ? foundNode.next : null;
-                Node prevNode = (position > 0) ? sorter.getNodeAtPosition(head, position - 1) : null;
-        
-                System.out.println("Senjata dengan harga " + targetHarga + " ditemukan pada posisi ke-" + position + ":");
-                System.out.println("Nama: " + foundNode.namaSenjata);
-                System.out.println("Stok: " + foundNode.stok);
-                System.out.println("Harga: " + foundNode.harga);
-        
-                if (nextNode != null) {
-                    System.out.println("Terletak setelah:");
-                    System.out.println("Nama: " + nextNode.namaSenjata);
-                    System.out.println("Stok: " + nextNode.stok);
-                    System.out.println("Harga: " + nextNode.harga);
-                }
-        
-                if (prevNode != null) {
-                    System.out.println("Terletak sebelum:");
-                    System.out.println("Nama: " + prevNode.namaSenjata);
-                    System.out.println("Stok: " + prevNode.stok);
-                    System.out.println("Harga: " + prevNode.harga);
-                }
+        while (current != null) {
+            if (current.harga == targetHarga) {
+                return current; // Mengembalikan node jika targetHarga ditemukan
+            } else if (current.harga < targetHarga) {
+                current = current.prev; // Cari di sebelah kiri
             } else {
-                System.out.println("Senjata dengan harga " + targetHarga + " tidak ditemukan.");
+                current = current.next; // Cari di sebelah kanan
             }
         }
-        
 
+        return null; // Tidak ditemukan
+    }
+    //ini fungsi search harga dengan binary search
+    public void searchByHargaDescending(Node head, int targetHarga) {
+        //isi node result dengan hasil binary search
+        Node result = binarySearchDescending(head, targetHarga);
+        //tampilkan nilai yang dicari
+        if (result != null) {
+            System.out.println("Senjata dengan harga " + targetHarga + " ditemukan");
+            System.out.println("Nama: " + result.namaSenjata);
+            System.out.println("Stok: " + result.stok);
+            System.out.println("Harga: " + result.harga);
     
+            Node nextNode = result.next;
+            Node prevNode = result.prev.prev.prev;
+            
+            //tampilkan nilai yang sebelum key yang dicari
+            if (nextNode != null) {
+                System.out.println("Terletak sebelum:");
+                System.out.println("Nama: " + nextNode.namaSenjata);
+                System.out.println("Stok: " + nextNode.stok);
+                System.out.println("Harga: " + nextNode.harga);
+            }
+            
+            //tampilkan nilai yang setelah key yang dicari
+            if (prevNode != null) {
+                // Perbaikan disini
+                Node prevPrevNode = prevNode.prev;
+                System.out.println("Terletak setelah:");
+                System.out.println("Nama: " + prevPrevNode.namaSenjata);
+                System.out.println("Stok: " + prevPrevNode.stok);
+                System.out.println("Harga: " + prevPrevNode.harga);
+            }
+        } else {
+            System.out.println("Senjata dengan harga " + targetHarga + " tidak ditemukan.");
+        }
+    }
+    
+
 }
+

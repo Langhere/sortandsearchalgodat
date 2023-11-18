@@ -1,6 +1,7 @@
 // sort.java
 public class sort {
     // Bubble sort berdasarkan stok
+    // Metode untuk melakukan pengurutan menggunakan algoritma Insertion Sort berdasarkan atribut harga dari setiap node dalam linked list secara menurun (descending order). Mengembalikan head dari linked list yang sudah diurutkan.
     public Node bubbleSortByStok(Node head) {
         int swapped;
         Node ptr1;
@@ -40,23 +41,26 @@ public class sort {
         return head;
     }
     public Node selectionSortByStok(Node head) {
+        // Memeriksa apakah linked list kosong atau hanya memiliki satu node. Jika ya, langsung mengembalikan head karena tidak perlu dilakukan pengurutan.
         if (head == null || head.next == null)
             return head;
-
+        // Inisialisasi node current sebagai head untuk iterasi melalui linked list.
         Node current = head;
-
+        // Memulai loop untuk iterasi melalui linked list.
         while (current != null) {
+            // sebagai node saat ini (current) dan node temp sebagai node berikutnya.
             Node maxNode = current;
             Node temp = current.next;
 
             while (temp != null) {
                 // Perbandingan untuk urutan descending berdasarkan stok
+                // Membandingkan nilai stok antara temp dan maxNode, dan jika temp memiliki nilai stok yang lebih besar, maka maxNode diupdate menjadi temp.
                 if (temp.stok > maxNode.stok) {
                     maxNode = temp;
                 }
                 temp = temp.next;
             }
-
+            //  Setelah menemukan node dengan nilai stok terbesar, dilakukan pertukaran nilai stok antara current dan maxNode.
             // Tukar data jika diperlukan
             int tempStok = current.stok;
             current.stok = maxNode.stok;
@@ -72,7 +76,7 @@ public class sort {
 
             current = current.next;
         }
-
+        // Mengembalikan head dari linked list yang sudah diurutkan menggunakan algoritma Selection Sort.
         return head;
     }
 
@@ -111,6 +115,7 @@ public Node insertionSortByHargaDescending(Node head) {
 }
 //merge sort
   // Merge Sort berdasarkan harga (Ascending)
+//   Metode untuk melakukan pengurutan menggunakan algoritma Merge Sort berdasarkan atribut harga dari setiap node dalam linked list secara menaik (ascending order). 
   public Node mergeSortByHargaAscending(Node head) {
     if (head == null || head.next == null) {
         return head;
@@ -162,31 +167,82 @@ private Node getMiddle(Node head) {
 
     return slow;
 }
-
-//quick sort
-// Quick Sort berdasarkan harga (Ascending)
-public Node quickSortByHargaAscending(Node head) {
+//shell
+// Shell Sort berdasarkan harga (Ascending)
+public Node shellSortByHargaAscending(Node head) {
+    // Memeriksa apakah linked list kosong atau hanya memiliki satu node. Jika ya, langsung mengembalikan head karena tidak perlu dilakukan pengurutan.
     if (head == null || head.next == null) {
         return head;
     }
+    // Menghitung jumlah node dalam linked list.
+    int n = getCount(head);
+// /   nisialisasi variabel gap sebagai setengah dari jumlah node, dan melakukan perulangan dengan mengurangi nilai gap menjadi setengahnya pada setiap iterasi.
+    for (int gap = n / 2; gap > 0; gap /= 2) {
+        // Iterasi melalui linked list dimulai dari posisi gap hingga akhir linked list.
+        for (int i = gap; i < n; i++) {
+            // Menyimpan nilai atribut harga, namaSenjata, dan id dari node pada posisi i.
+            int harga = getNodeAtPosition(head, i).harga;
+            String namaSenjata = getNodeAtPosition(head, i).namaSenjata;
+            String id = getNodeAtPosition(head, i).id;
 
-    Node pivot = partition(head);
-    quickSortByHargaAscending(pivot.prev);
-    quickSortByHargaAscending(pivot.next);
+            int j;
+            for (j = i; j >= gap && getNodeAtPosition(head, j - gap).harga > harga; j -= gap) {
+                // Memulai iterasi mundur untuk membandingkan dan menukar node dengan selisih gap jika nilai harga lebih kecil dari node yang lebih awal dalam urutan.
+                // Menyimpan node sebelumnya dengan selisih gap dari posisi saat ini.
+                Node prevNode = getNodeAtPosition(head, j - gap);
 
-    return pivot;
+                // Pindahkan data jika diperlukan
+                // Memindahkan data dari prevNode ke node pada posisi j.
+                getNodeAtPosition(head, j).harga = prevNode.harga;
+                getNodeAtPosition(head, j).namaSenjata = prevNode.namaSenjata;
+                getNodeAtPosition(head, j).id = prevNode.id;
+            }
+
+            // Tempatkan elemen pada posisi yang benar
+            getNodeAtPosition(head, j).harga = harga;
+            getNodeAtPosition(head, j).namaSenjata = namaSenjata;
+            getNodeAtPosition(head, j).id = id;
+        }
+    }
+
+    return head;
 }
 
+
+//quick sort
+// Quick Sort berdasarkan harga (Ascending)
+// Dimulai dengan metode quick sort yang akan mengurutkan linked list berdasarkan harga secara menaik.
+public Node quickSortByHargaAscending(Node head) {
+    // Memeriksa apakah linked list kosong atau hanya memiliki satu node. Jika ya, langsung mengembalikan head karena tidak perlu dilakukan pengurutan.
+    if (head == null || head.next == null) {
+        return head;
+    }
+    // Memanggil metode partition untuk membagi linked list berdasarkan pivot dan mendapatkan nilai pivot.
+    Node pivot = partition(head);
+    // Memanggil rekursif quick sort untuk bagian linked list yang lebih kecil dari pivot (nilai yang lebih rendah).
+    quickSortByHargaAscending(pivot.prev);
+    // Memanggil rekursif quick sort untuk bagian linked list yang lebih besar dari pivot (nilai yang lebih tinggi).
+    quickSortByHargaAscending(pivot.next);
+    // Mengembalikan pivot sebagai bagian dari linked list yang sudah diurutkan.
+    return pivot;
+}
+// Metode untuk membagi linked list berdasarkan nilai pivot.
 private Node partition(Node head) {
     if (head == null || head.next == null) {
         return head;
     }
-
+    // Memilih pivot dengan memanggil metode choosePivot.
     Node pivot = choosePivot(head);
+    // Inisialisasi tiga linked list sementara untuk menyimpan node yang memiliki nilai harga lebih kecil, sama, dan lebih besar dari pivot.
     Node smaller = null, equal = null, larger = null;
+    // Inisialisasi node current sebagai head untuk iterasi melalui linked list.
     Node current = head;
-
+    // Memulai loop untuk iterasi melalui linked list.
     while (current != null) {
+        // Blok if-else berikut ini membagi node-node ke dalam tiga kategori berdasarkan nilai harga terhadap pivot
+// Jika nilai harga kurang dari pivot, node dimasukkan ke dalam kategori smaller.
+// Jika nilai harga sama dengan pivot, node dimasukkan ke dalam kategori equal.
+// Jika nilai harga lebih besar dari pivot, node dimasukkan ke dalam kategori larger.
         if (current.harga < pivot.harga) {
             if (smaller == null) {
                 smaller = current;
@@ -209,15 +265,18 @@ private Node partition(Node head) {
                 larger = current;
             }
         }
+        // Pindah ke node berikutnya dalam linked list untuk melanjutkan iterasi.
         current = current.next;
-    }
-
+    }   
+    // Jika terdapat node-node yang memiliki nilai harga sama dengan pivot, menggabungkan linked list smaller dan equal.
     if (equal != null) {
         smaller = concatenate(smaller, equal);
     }
+    //  Menggabungkan linked list smaller dan larger, kemudian mengembalikan hasilnya.
     return concatenate(smaller, larger);
 }
-
+// Metode untuk menggabungkan dua linked list.
+// Blok ini menggabungkan dua linked list dengan mengatur pointer dari akhir linked list pertama ke awal linked list kedua.
 private Node concatenate(Node smaller, Node larger) {
     if (smaller == null) {
         return larger;
@@ -231,14 +290,13 @@ private Node concatenate(Node smaller, Node larger) {
     current.next = larger;
     return smaller;
 }
-
+// Metode untuk memilih pivot, dalam hal ini, pivot diambil dari pertengahan linked list.
 private Node choosePivot(Node head) {
-    // You can choose a pivot in various ways, e.g., random pivot, middle element, etc.
-    // For simplicity, let's choose the middle element as the pivot.
+    // emanggil metode getMiddle untuk mendapatkan node tengah sebagai pivot, kemudian mengembalikannya.
     Node middle = getMiddle(head);
     return middle;
 }
-
+// Metode untuk mendapatkan node pada posisi tertentu dalam linked list.
 public Node getNodeAtPosition(Node head, int position) {
     Node current = head;
     for (int i = 0; i < position && current != null; i++) {
@@ -246,7 +304,7 @@ public Node getNodeAtPosition(Node head, int position) {
     }
     return current;
 }
-
+// Metode untuk menghitung jumlah node dalam linked list.
 public int getCount(Node head) {
     int count = 0;
     Node temp = head;
@@ -256,27 +314,6 @@ public int getCount(Node head) {
     }
     return count;
 }
-public int binarySearch(Node head, int targetHarga) {
-    int low = 0;
-    int high = getCount(head) - 1;
-
-    while (low <= high) {
-        int mid = (low + high) / 2;
-        Node midNode = getNodeAtPosition(head, mid);
-
-        if (midNode.harga == targetHarga) {
-            return mid;
-        } else if (midNode.harga < targetHarga) {
-            low = mid + 1;
-        } else {
-            high = mid - 1;
-        }
-    }
-
-    return -1; // Not found
-}
-
-///
 
 
 }
